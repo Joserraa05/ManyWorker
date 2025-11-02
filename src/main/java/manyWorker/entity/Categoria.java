@@ -8,10 +8,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 public class Categoria {
+	//Comprobamos que el formato sea correcto por si se introduce manualmente
 	@Id
+	@Pattern(regexp = "\\d{6}-[A-Z0-9]{6}", message = "Formato de ID inválido (yyMMdd-XXXXXX)")
 	private String id;
 	@NotBlank
 	private String titulo;
@@ -27,6 +30,10 @@ public class Categoria {
 		this.titulo = titulo;
 		this.leyesAplicables = leyesAplicables;
 		this.tareas = tareas;
+	}
+
+	public Categoria() {
+		super();
 	}
 
 	public String getId() {

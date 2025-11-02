@@ -24,7 +24,7 @@ public class Tarea {
 	private Double precioMax;
 	
 	@Future
-	private Date fechaFin;
+	private LocalDate fechaFin;
 	
 	@ManyToOne
 	private Categoria categoria;
@@ -39,7 +39,7 @@ public class Tarea {
 	}
 	
 	public Tarea(String id, LocalDate fechaPublicacion, String descripcion, String direccion, Double precioMax,
-			@Future Date fechaFin, Categoria categoria) {
+			@Future LocalDate fechaFin, Categoria categoria) {
 		super();
 		this.id = id;
 		this.fechaPublicacion = fechaPublicacion;
@@ -50,6 +50,10 @@ public class Tarea {
 		this.categoria = categoria;
 	}
 	
+	public Tarea() {
+		super();
+	}
+
 	public String getId() {
 		return id;
 	}
@@ -90,11 +94,11 @@ public class Tarea {
 		this.precioMax = precioMax;
 	}
 
-	public Date getFechaFin() {
+	public LocalDate getFechaFin() {
 		return fechaFin;
 	}
 
-	public void setFechaFin(Date fechaFin) {
+	public void setFechaFin(LocalDate fechaFin) {
 		this.fechaFin = fechaFin;
 	}
 
