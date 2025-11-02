@@ -4,12 +4,10 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import org.hibernate.annotations.UpdateTimestamp;
-import org.hibernate.validator.constraints.URL;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
-import jakarta.persistence.Lob;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -27,7 +25,6 @@ public class Tutorial extends DomainEntity {
 	private String resumen;
 	
 	@ElementCollection // Para crear una tabla separada para esta lista
-	@URL
 	private List<String> imagenes;
 	
 	@NotBlank
