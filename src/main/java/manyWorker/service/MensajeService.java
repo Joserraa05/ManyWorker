@@ -17,6 +17,7 @@ public class MensajeService {
 
 	@Autowired
 	private MensajeRepository mensajeRepository;
+	@Autowired
 	private ActorRepository actorRepository;
 	
 	public Optional<Mensaje> findById(int id) {
@@ -61,5 +62,38 @@ public class MensajeService {
     // Obtener mensajes recibidos por un actor
     public List<Mensaje> obtenerMensajesRecibidos(int id) {
         return mensajeRepository.findByDestinatarioId(id);
+    }
+    
+ // Enviar mensaje de broadcast (solo admin)
+    public List<Mensaje> enviarBroadcast(int idRemitente, String asunto, String cuerpo) {
+
+        Actor remitente = actorRepository.findById(idRemitente)
+                .orElseThrow(() -> new RuntimeException("Remitente no encontrado"));
+
+        // Verificar que el remitente sea administrador
+        if (remitente.getAuthority() == null || !remitente.getAuthority().equalsIgnoreCase("admin")) {
+            throw new RuntimeException("Solo los administradores pueden enviar mensajes broadcast");
+        }
+
+        // Obtener todos los actores
+        List<Actor> todosActores = actorRepository.findAll();
+
+        // Crear lista para los mensajes a enviar
+        List<Mensaje> mensajes = new java.util.ArrayList<>();
+
+        // Recorrer los actores y crear un mensaje para cada uno
+        for (Actor destinatario : todosActores) {
+            
+        	// Evitar enviarse a sí mismo
+            if (destinatario.getId() != remitente.getId()) {
+                Mensaje nuevo = new Mensaje(remitente, destinatario, new java.util.Date(), asunto, cuerpo);
+                mensajes.add(nuevo);
+            }
+        }
+
+        // Guardar todos los mensajes en la base de datos
+        mensajeRepository.saveAll(mensajes);
+
+        return mensajes;
     }
 }

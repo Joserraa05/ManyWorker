@@ -16,6 +16,9 @@ import jakarta.validation.constraints.Pattern;
 public class Actor extends DomainEntity{
 
 	@NotBlank
+	private String authority; // tipos de autoridad: "ADMIN", "CLIENTE", "TRABAJADOR"
+	
+	@NotBlank
 	private String nombre;
 	
 	@NotBlank
@@ -41,8 +44,9 @@ public class Actor extends DomainEntity{
 	//Constructor
 	public Actor(@NotBlank String nombre, @NotBlank String apellido, String apellido2, @URL String foto,
 			@Pattern(regexp = "^\\w[@]\\w[.]\\w$") String correo, @Pattern(regexp = "^[6-9][0-9]{8}$") String telefono,
-			String direccion, @NotBlank List<PerfilSocial> numeroPerfiles) {
+			String direccion, @NotBlank List<PerfilSocial> numeroPerfiles, @NotBlank String authority) {
 		super();
+		this.authority = authority;
 		this.nombre = nombre;
 		this.apellido = apellido;
 		this.apellido2 = apellido2;
@@ -59,6 +63,14 @@ public class Actor extends DomainEntity{
 	}
 	
 	//Getter y setter
+	public String getAuthority() {
+        return authority;
+    }
+
+    public void setAuthority(String authority) {
+        this.authority = authority;
+    }
+	
 	public String getNombre() {
 		return nombre;
 	}

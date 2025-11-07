@@ -12,7 +12,7 @@ import jakarta.validation.constraints.NotNull;
 @Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Mensaje extends DomainEntity {
-
+	
 	@NotNull
 	@ManyToOne
 	private Actor remitente;
@@ -29,7 +29,7 @@ public class Mensaje extends DomainEntity {
 	
 	@NotBlank
 	private String cuerpo;
-
+	
 	public Mensaje(Actor remitente, Actor destinatario, @NotBlank Date fechaEnvío, @NotBlank String asunto, @NotBlank String cuerpo) {
 		super();
 		this.remitente = remitente;

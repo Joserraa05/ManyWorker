@@ -17,8 +17,8 @@ public class Trabajador extends Actor{
 	//Constructor
 	public Trabajador(@NotBlank String nombre, @NotBlank String apellido, String apellido2, @URL String foto,
 			@Pattern(regexp = "^\\w[@]\\w[.]\\w$") String correo, @Pattern(regexp = "^[6-9][0-9]{8}$") String telefono,
-			String direccion, @NotBlank List<PerfilSocial> numeroPerfiles, @NotBlank String nombreTrabajador) {
-		super(nombre, apellido, apellido2, foto, correo, telefono, direccion, numeroPerfiles);
+			String direccion, @NotBlank List<PerfilSocial> numeroPerfiles, @NotBlank String nombreTrabajador, @NotBlank String authority) {
+		super(nombre, apellido, apellido2, foto, correo, telefono, direccion, numeroPerfiles, authority);
 		
 		//super.get() para recoger el nombre y apellido y formal el nombre comercial del trabajador
  		this.nombreComercial = super.getNombre() + " " + super.getApellido();
