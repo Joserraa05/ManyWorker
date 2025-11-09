@@ -8,7 +8,9 @@ import org.hibernate.annotations.UpdateTimestamp;
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 
 @Entity
 public class Tutorial extends DomainEntity {
@@ -30,6 +32,10 @@ public class Tutorial extends DomainEntity {
 	@NotBlank
 	@Column(columnDefinition = "TEXT") // Si la cadena de texto es muy larga, neceistamos estos atributo
 	private String texto;
+
+	@ManyToOne
+	@NotNull
+	private Trabajador autor;
 
 	// Constructor vacío
 	public Tutorial() {
@@ -77,5 +83,13 @@ public class Tutorial extends DomainEntity {
 		this.texto = texto;
 	}
 	
+	
+	public Trabajador getAutor() {
+		return autor;
+	}
+
+	public void setAutor(Trabajador autor) {
+		this.autor = autor;
+	}
 	
 }

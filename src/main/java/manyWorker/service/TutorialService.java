@@ -42,6 +42,8 @@ public class TutorialService {
 			tutorialAntiguo.setResumen(tutorialNuevosDatos.getResumen());
 			tutorialAntiguo.setImagenes(tutorialNuevosDatos.getImagenes());
 			tutorialAntiguo.setTexto(tutorialNuevosDatos.getTexto());
+			
+			tutorialAntiguo.setAutor(tutorialNuevosDatos.getAutor());
 
 			return save(tutorialAntiguo);
 		}
