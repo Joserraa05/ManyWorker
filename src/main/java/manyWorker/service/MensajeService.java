@@ -15,51 +15,42 @@ import manyWorker.repository.MensajeRepository;
 @Service
 public class MensajeService {
 
-	@Autowired
-	private MensajeRepository mensajeRepository;
-	private ActorRepository actorRepository;
-	
-	public Optional<Mensaje> findById(int id) {
-		return this.mensajeRepository.findById(id);
-	}
-	
-	public List<Mensaje> findAll() {
-		return this.mensajeRepository.findAll();
-	}
-	
-	public Mensaje save(Mensaje mensaje) {
-		return this.mensajeRepository.save(mensaje);
-	}
-	
-	public void delete(int id) {
-		this.mensajeRepository.deleteById(id);
-	}
-	
-	// Enviar un mensaje entre actores
-    public Mensaje enviarMensaje(int IdRemitente, int IdDestinatario, String asunto, String cuerpo) {
-    	
-    	Optional<Actor> oRemitente = actorRepository.findById(IdRemitente);
-    	Optional<Actor> oDestinatario = actorRepository.findById(IdDestinatario);
-    	Actor remitente = null;
-    	Actor destinatario = null;
-    	
-        		if (oRemitente.isPresent() && oDestinatario.isPresent()) {
-        			remitente = oRemitente.get();
-        			destinatario = oDestinatario.get();
-        		}
-        		else throw new RuntimeException("Remitente, Destinatario o ambos no existen");
+    @Autowired
+    private MensajeRepository mensajeRepository;
 
-        Mensaje mensaje = new Mensaje(remitente, destinatario, new Date(), asunto, cuerpo);
+    @Autowired
+    private ActorRepository actorRepository;
+
+    public Optional<Mensaje> findById(int id) {
+        return mensajeRepository.findById(id);
+    }
+
+    public List<Mensaje> findAll() {
+        return mensajeRepository.findAll();
+    }
+
+    public Mensaje save(Mensaje mensaje) {
         return mensajeRepository.save(mensaje);
     }
 
-    // Obtener mensajes enviados por un actor
-    public List<Mensaje> obtenerMensajesEnviados(int id) {
-        return mensajeRepository.findByRemitenteId(id);
+    public void delete(int id) {
+        mensajeRepository.deleteById(id);
     }
 
-    // Obtener mensajes recibidos por un actor
-    public List<Mensaje> obtenerMensajesRecibidos(int id) {
-        return mensajeRepository.findByDestinatarioId(id);
+    // Enviar un mensaje entre actores
+    public Mensaje enviarMensaje(int idRemitente, int idDestinatario, String asunto, String cuerpo) {
+
+        Optional<Actor> oRemitente = actorRepository.findById(idRemitente);
+        Optional<Actor> oDestinatario = actorRepository.findById(idDestinatario);
+
+        if (!oRemitente.isPresent() || !oDestinatario.isPresent()) {
+            throw new RuntimeException("Remitente o destinatario no encontrados");
+        }
+
+        Actor remitente = oRemitente.get();
+        Actor destinatario = oDestinatario.get();
+
+        Mensaje mensaje = new Mensaje(remitente, destinatario, new Date(), asunto, cuerpo);
+        return mensajeRepository.save(mensaje);
     }
 }

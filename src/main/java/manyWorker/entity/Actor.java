@@ -26,7 +26,7 @@ public class Actor extends DomainEntity{
 	@URL 
 	private String foto;
 	
-	@Pattern(regexp = "^\\w[@]\\w[.]\\w$")
+	@Pattern(regexp = "^[\\w._%+-]+@[\\w.-]+\\.[a-zA-Z]{2,}$")
 	private String correo;
 	
 	@Pattern(regexp = "^[6-9][0-9]{8}$")

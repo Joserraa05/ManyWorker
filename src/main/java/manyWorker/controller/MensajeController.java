@@ -1,85 +1,70 @@
 package manyWorker.controller;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import io.swagger.v3.oas.annotations.Operation;
-import jakarta.servlet.http.HttpServletResponse;
 import manyWorker.entity.Mensaje;
 import manyWorker.service.MensajeService;
 
+// DTO simple para enviar mensajes
+class EnviarMensajeRequest {
+    public int idRemitente;
+    public int idDestinatario;
+    public String asunto;
+    public String cuerpo;
+}
+
 @RestController
-@RequestMapping("/mensaje")
+@RequestMapping("/mensajes")
 public class MensajeController {
 
-	@Autowired
-	private MensajeService mensajeService;
-	
-	@GetMapping()
-	public ResponseEntity<List<Mensaje>> findAll() {
-		return ResponseEntity.ok(mensajeService.findAll());
-	}
-	
-	@GetMapping("/{id}")
-	@Operation(summary = "Método para buscar mensaje por id")
-	public ResponseEntity<Mensaje> findById(@PathVariable int id) {
-		Optional<Mensaje> oMensaje = mensajeService.findById(id);
-		
-		if (oMensaje.isPresent()) {
-			return ResponseEntity.ok(oMensaje.get());
-		} else {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null);
-		}
-	}
-	
-	@PostMapping
-	public void save(@RequestBody Mensaje m, HttpServletResponse response) throws IOException {
-		mensajeService.save(m);
-		response.setStatus(400);
-		response.getWriter().println("Mensaje creado.");
-	}
-	
-	@DeleteMapping("/{id}")
-	public void delete(@PathVariable int id, HttpServletResponse response) throws IOException {
-		Optional<Mensaje> oMensaje = mensajeService.findById(id);
+    @Autowired
+    private MensajeService mensajeService;
 
-		if (oMensaje.isPresent()) {
-			response.setStatus(200);
-			response.getWriter().println("Mensaje eliminado");
-			mensajeService.delete(id);
-		} else {
-			response.setStatus(400);
-			response.getWriter().println("Mensaje no encontrado");
-		}
-	}
-	
-	// Enviar un mensaje
+    @GetMapping
+    @Operation(summary = "Obtener todos los mensajes")
+    public ResponseEntity<List<Mensaje>> findAll() {
+        return ResponseEntity.ok(mensajeService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Obtener mensaje por ID")
+    public ResponseEntity<Mensaje> findById(@PathVariable int id) {
+        Optional<Mensaje> mensaje = mensajeService.findById(id);
+        if (mensaje.isPresent()) {
+            return ResponseEntity.ok(mensaje.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+    }
+
     @PostMapping("/enviar")
-    public Mensaje enviarMensaje(@RequestBody int idRemitente, @RequestBody int idDestinatario, @RequestBody String asunto, @RequestBody String cuerpo) {
-        return mensajeService.enviarMensaje(idRemitente, idDestinatario, asunto, cuerpo);
+    @Operation(summary = "Enviar un mensaje entre actores")
+    public ResponseEntity<?> enviarMensaje(@RequestBody EnviarMensajeRequest request) {
+        try {
+            Mensaje nuevo = mensajeService.enviarMensaje(
+                    request.idRemitente, request.idDestinatario, request.asunto, request.cuerpo);
+            return ResponseEntity.status(HttpStatus.CREATED).body(nuevo);
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
     }
 
-    // Ver los mensajes enviados
-    @GetMapping("/enviados/{actorId}")
-    public List<Mensaje> obtenerMensajesEnviados(@PathVariable int id) {
-        return mensajeService.obtenerMensajesEnviados(id);
-    }
-
-    // Ver los mensajes recibidos
-    @GetMapping("/recibidos/{actorId}")
-    public List<Mensaje> obtenerMensajesRecibidos(@PathVariable int id) {
-        return mensajeService.obtenerMensajesRecibidos(id);
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Eliminar un mensaje por ID")
+    public ResponseEntity<?> delete(@PathVariable int id) {
+        Optional<Mensaje> mensaje = mensajeService.findById(id);
+        if (mensaje.isPresent()) {
+            mensajeService.delete(id);
+            return ResponseEntity.ok("Mensaje eliminado correctamente");
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Mensaje no encontrado");
+        }
     }
 }
