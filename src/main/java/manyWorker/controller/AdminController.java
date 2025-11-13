@@ -24,65 +24,60 @@ public class AdminController {
     private AdminService adminService;
 
     @GetMapping
-    @Operation(summary = "Obtener todos los administradores", description = "Devuelve una lista completa de todos los administradores registrados en el sistema.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de administradores obtenida correctamente")
-    })
+    @Operation(summary = "Obtener todos los administradores")
     public ResponseEntity<List<Admin>> findAll() {
         return ResponseEntity.ok(adminService.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar administrador por ID", description = "Busca un administrador específico utilizando su ID.")
+    @Operation(summary = "Buscar administrador por ID")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Administrador encontrado"),
-            @ApiResponse(responseCode = "400", description = "Administrador no encontrado")
+            @ApiResponse(responseCode = "404", description = "Administrador no encontrado") // Cambiado a 404
     })
     public ResponseEntity<Admin> findById(@PathVariable int id) {
         Optional<Admin> oAdmin = adminService.findById(id);
         return oAdmin.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+                     .orElseGet(() -> ResponseEntity.notFound().build()); // Mejor usar 404
     }
 
     @PostMapping
-    @Operation(summary = "Crear un nuevo administrador", description = "Registra un nuevo administrador en la base de datos.")
+    @Operation(summary = "Crear un nuevo administrador")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Administrador creado correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al crear el administrador") 
+            @ApiResponse(responseCode = "201", description = "Administrador creado correctamente"), // Cambiado a 201
+            @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     public ResponseEntity<String> save(@RequestBody Admin admin) {
-        adminService.save(admin);
-        return ResponseEntity.status(HttpStatus.OK).body("Administrador creado correctamente");
+        Admin savedAdmin = adminService.save(admin);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Administrador creado correctamente con ID: " + savedAdmin.getId());
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un administrador", description = "Actualiza la información de un administrador existente según su ID.")
+    @Operation(summary = "Actualizar un administrador")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Administrador actualizado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Administrador no encontrado o datos inválidos"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar el administrador") 
+            @ApiResponse(responseCode = "404", description = "Administrador no encontrado")
     })
     public ResponseEntity<String> update(@PathVariable int id, @RequestBody Admin admin) {
-        if (adminService.update(id, admin) == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Administrador no encontrado");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body("Administrador actualizado correctamente");
+        Admin updatedAdmin = adminService.update(id, admin);
+        if (updatedAdmin == null) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok("Administrador actualizado correctamente");
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un administrador", description = "Elimina un administrador existente de la base de datos utilizando su ID.")
+    @Operation(summary = "Eliminar un administrador")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Administrador eliminado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Administrador no encontrado") 
+            @ApiResponse(responseCode = "404", description = "Administrador no encontrado") 
     })
     public ResponseEntity<String> delete(@PathVariable int id) {
-        Optional<Admin> oAdmin = adminService.findById(id);
-        if (oAdmin.isPresent()) {
-            adminService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Administrador eliminado correctamente");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Administrador no encontrado");
+        if (!adminService.findById(id).isPresent()) {
+            return ResponseEntity.notFound().build();
         }
+        adminService.delete(id);
+        return ResponseEntity.ok("Administrador eliminado correctamente");
     }
 }

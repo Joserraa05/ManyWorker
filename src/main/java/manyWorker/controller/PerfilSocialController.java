@@ -70,18 +70,16 @@ public class PerfilSocialController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un perfil social", description = "Elimina un perfil social existente de la base de datos utilizando su ID.")
+    @Operation(summary = "Eliminar un perfil social")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Perfil social eliminado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Perfil social no encontrado") 
+            @ApiResponse(responseCode = "404", description = "Perfil social no encontrado") 
     })
     public ResponseEntity<String> delete(@PathVariable int id) {
-        Optional<PerfilSocial> oPerfilSocial = perfilSocialService.findById(id);
-        if (oPerfilSocial.isPresent()) {
-        	perfilSocialService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Perfil social eliminado correctamente");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Perfil social no encontrado");
+        if (!perfilSocialService.existsById(id)) {
+            return ResponseEntity.notFound().build();
         }
+        perfilSocialService.delete(id);
+        return ResponseEntity.ok("Perfil social eliminado correctamente");
     }
 }

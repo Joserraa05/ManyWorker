@@ -46,4 +46,7 @@ public class PerfilSocialService {
 		this.perfilSocialRepository.deleteById(id);
 	}
 	
+	public boolean existsById(int id) {
+	    return this.perfilSocialRepository.existsById(id);
+	}
 }

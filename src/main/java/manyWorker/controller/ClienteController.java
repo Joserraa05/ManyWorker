@@ -25,88 +25,68 @@ public class ClienteController {
     private ClienteService clienteService;
 
     @GetMapping
-    @Operation(summary = "Obtener todos los clientes", description = "Devuelve una lista completa de todos los clientes registrados en el sistema.")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de clientes obtenida correctamente")
-    })
+    @Operation(summary = "Obtener todos los clientes")
     public ResponseEntity<List<Cliente>> findAll() {
         return ResponseEntity.ok(clienteService.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar cliente por ID", description = "Busca un cliente específico utilizando su ID.")
+    @Operation(summary = "Buscar cliente por ID")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Cliente encontrado"),
-            @ApiResponse(responseCode = "400", description = "Cliente no encontrado")
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
     })
     public ResponseEntity<Cliente> findById(@PathVariable int id) {
         Optional<Cliente> oCliente = clienteService.findById(id);
         return oCliente.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+                     .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    @Operation(summary = "Crear un nuevo cliente", description = "Registra un nuevo cliente en la base de datos.")
+    @Operation(summary = "Crear un nuevo cliente")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Cliente creado correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al crear el cliente") 
+            @ApiResponse(responseCode = "201", description = "Cliente creado correctamente"),
+            @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     public ResponseEntity<String> save(@RequestBody Cliente cliente) {
-        clienteService.save(cliente);
-        return ResponseEntity.status(HttpStatus.OK).body("Cliente creado correctamente");
+        Cliente savedCliente = clienteService.save(cliente);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Cliente creado correctamente con ID: " + savedCliente.getId());
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar un cliente", description = "Actualiza la información de un cliente existente según su ID.")
+    @Operation(summary = "Actualizar un cliente")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Cliente actualizado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Cliente no encontrado o datos inválidos"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar el cliente") 
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado")
     })
     public ResponseEntity<String> update(@PathVariable int id, @RequestBody Cliente cliente) {
-        if (clienteService.update(id, cliente) == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body("Cliente actualizado correctamente");
+        Cliente updatedCliente = clienteService.update(id, cliente);
+        if (updatedCliente == null) {
+            return ResponseEntity.notFound().build();
         }
+        return ResponseEntity.ok("Cliente actualizado correctamente");
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar un cliente", description = "Elimina un cliente existente de la base de datos utilizando su ID.")
+    @Operation(summary = "Eliminar un cliente")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Cliente eliminado correctamente"),
-            @ApiResponse(responseCode = "400", description = "Cliente no encontrado") 
+            @ApiResponse(responseCode = "404", description = "Cliente no encontrado") 
     })
     public ResponseEntity<String> delete(@PathVariable int id) {
-        Optional<Cliente> oCliente = clienteService.findById(id);
-        if (oCliente.isPresent()) {
-            clienteService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Cliente eliminado correctamente");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado");
+        if (!clienteService.existsById(id)) {
+            return ResponseEntity.notFound().build();
         }
+        clienteService.delete(id);
+        return ResponseEntity.ok("Cliente eliminado correctamente");
     }
     
-    //Edicion de datos personales
-    @PutMapping("/update/{id}")
-    public ResponseEntity<Cliente> updateCliente(@PathVariable int id, @RequestBody Cliente updatedCliente) {
-        Cliente cliente = clienteService.updateCliente(id, updatedCliente);
-        return ResponseEntity.ok(cliente);
-    }
-    
-    //Exportacion de datos personales
-    @GetMapping("/exportar/{id}/export")
+    //Exportacion de datos personales - ESTE SÍ MANTENERLO si es diferente
+    @GetMapping("/exportar/{id}")
+    @Operation(summary = "Exportar datos del cliente")
     public ResponseEntity<Map<String, Object>> exportarDatos(@PathVariable int id) {
         Map<String, Object> datos = clienteService.exportarDatos(id);
         return ResponseEntity.ok(datos);
     }
-
-    //Eliminacion de datos personales
-    @DeleteMapping("/borrar/{id}")
-    public ResponseEntity<Void> eliminarCliente(@PathVariable int id) {
-        clienteService.eliminarCliente(id);
-        return ResponseEntity.noContent().build();
-    }
-
-    
 }

@@ -27,6 +27,10 @@ public class PerfilSocial extends DomainEntity{
 		this.nombreRedSocial = nombreRedSocial;
 		this.enlace = enlace;
 	}
+	
+	public PerfilSocial() {
+        super();
+    }
 
 	//getter y setter
 	public String getApodo() {

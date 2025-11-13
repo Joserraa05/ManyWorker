@@ -50,4 +50,7 @@ public class TrabajadorService {
 		this.trabajadorRepository.deleteById(id);
 	}
 	
+	public boolean existsById(int id) {
+	    return this.trabajadorRepository.existsById(id);
+	}
 }

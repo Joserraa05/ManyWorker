@@ -50,4 +50,7 @@ public class AdminService {
 		this.adminRepository.deleteById(id);
 	}
 	
+	public boolean existsById(int id) {
+	    return this.adminRepository.existsById(id);
+	}
 }
