@@ -25,6 +25,10 @@ public class Solicitud extends DomainEntity{
     @ManyToOne
     private Trabajador trabajador;
 
+    //Relación con Tarea
+    @ManyToOne
+    private Tarea tarea;
+
     public Solicitud() {
         this.fechaRegistro = LocalDateTime.now();
         this.estado = EstadoSolicitud.PENDIENTE;
@@ -68,5 +72,14 @@ public class Solicitud extends DomainEntity{
 
     public void setTrabajador(Trabajador trabajador) {
         this.trabajador = trabajador;
+    }
+
+    // NUEVOS GETTER Y SETTER para Tarea
+    public Tarea getTarea() {
+        return tarea;
+    }
+
+    public void setTarea(Tarea tarea) {
+        this.tarea = tarea;
     }
 }
