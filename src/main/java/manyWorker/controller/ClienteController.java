@@ -1,6 +1,7 @@
 package manyWorker.controller;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -85,4 +86,27 @@ public class ClienteController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Cliente no encontrado");
         }
     }
+    
+    //Edicion de datos personales
+    @PutMapping("/update/{id}")
+    public ResponseEntity<Cliente> updateCliente(@PathVariable int id, @RequestBody Cliente updatedCliente) {
+        Cliente cliente = clienteService.updateCliente(id, updatedCliente);
+        return ResponseEntity.ok(cliente);
+    }
+    
+    //Exportacion de datos personales
+    @GetMapping("/exportar/{id}/export")
+    public ResponseEntity<Map<String, Object>> exportarDatos(@PathVariable int id) {
+        Map<String, Object> datos = clienteService.exportarDatos(id);
+        return ResponseEntity.ok(datos);
+    }
+
+    //Eliminacion de datos personales
+    @DeleteMapping("/borrar/{id}")
+    public ResponseEntity<Void> eliminarCliente(@PathVariable int id) {
+        clienteService.eliminarCliente(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    
 }

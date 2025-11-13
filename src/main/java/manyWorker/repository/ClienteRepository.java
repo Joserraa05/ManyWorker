@@ -7,5 +7,5 @@ import manyWorker.entity.Cliente;
 
 @Repository
 public interface ClienteRepository extends JpaRepository<Cliente, Integer>{
-
+	
 }

@@ -2,11 +2,13 @@ package manyWorker.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
@@ -16,19 +18,33 @@ public class Categoria {
 	@Id
 	@Pattern(regexp = "\\d{6}-[A-Z0-9]{6}", message = "Formato de ID inválido (yyMMdd-XXXXXX)")
 	private String id;
+	
 	@NotBlank
 	private String titulo;
     
     private String leyesAplicables;
 
+    private boolean esReparacion;
+
     @OneToMany
     private List<Tarea> tareas = new ArrayList<>();
 
-	public Categoria(String id, @NotBlank String titulo, String leyesAplicables, List<Tarea> tareas) {
+    // Generador automático de ID antes de persistir si no está asignado
+    @PrePersist
+    public void generarId() {
+        if (this.id == null || this.id.trim().isEmpty()) {
+            String fecha = java.time.LocalDate.now().format(java.time.format.DateTimeFormatter.ofPattern("yyMMdd"));
+            String random = UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+            this.id = fecha + "-" + random;
+        }
+    }
+
+	public Categoria(String id, @NotBlank String titulo, String leyesAplicables, boolean esReparacion, List<Tarea> tareas) {
 		super();
 		this.id = id;
 		this.titulo = titulo;
 		this.leyesAplicables = leyesAplicables;
+		this.esReparacion = esReparacion;
 		this.tareas = tareas;
 	}
 
@@ -60,6 +76,14 @@ public class Categoria {
 		this.leyesAplicables = leyesAplicables;
 	}
 
+	public boolean isEsReparacion() {
+		return esReparacion;
+	}
+
+	public void setEsReparacion(boolean esReparacion) {
+		this.esReparacion = esReparacion;
+	}
+
 	public List<Tarea> getTareas() {
 		return tareas;
 	}
@@ -67,5 +91,4 @@ public class Categoria {
 	public void setTareas(List<Tarea> tareas) {
 		this.tareas = tareas;
 	}    
-    
 }

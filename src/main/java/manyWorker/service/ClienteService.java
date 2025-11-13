@@ -1,11 +1,14 @@
 package manyWorker.service;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import jakarta.transaction.Transactional;
 import manyWorker.entity.Cliente;
 import manyWorker.repository.ClienteRepository;
 
@@ -50,4 +53,50 @@ public class ClienteService {
 		this.clienteRepository.deleteById(id);
 	}
 	
+	//Edicion de datos personales
+	public Cliente updateCliente(int id, Cliente updatedCliente) {
+		
+		Optional<Cliente> optionalCliente = clienteRepository.findById(id);
+		
+		if(optionalCliente.isEmpty()){
+			throw new RuntimeException("Cliente no encontrado");
+		}
+		
+		Cliente existing = optionalCliente.get();
+		
+	    existing.setNombre(updatedCliente.getNombre());
+	    existing.setApellido(updatedCliente.getApellido());
+	    existing.setFoto(updatedCliente.getFoto());
+	    existing.setCorreo(updatedCliente.getCorreo());
+	    existing.setTelefono(updatedCliente.getTelefono());
+	    existing.setNumeroPerfiles(updatedCliente.getNumeroPerfiles());
+	    // otros campos personales
+	    return clienteRepository.save(existing);
+	}
+	
+	//Exportacion de datos personales
+	public Map<String, Object> exportarDatos(int id) {
+	    Cliente cliente = clienteRepository.findById(id)
+	            .orElseThrow(() -> new RuntimeException("Cliente no encontrado"));
+	    Map<String, Object> datos = new HashMap<>();
+	    datos.put("nombre", cliente.getNombre());
+	    datos.put("apellido", cliente.getApellido());
+	    datos.put("foto", cliente.getFoto());
+	    datos.put("correo", cliente.getCorreo());
+	    datos.put("telefono", cliente.getTelefono());
+	    datos.put("numero perfiles", cliente.getNumeroPerfiles());
+	    // incluir datos de relaciones si aplica
+	    return datos;
+	}
+
+	//Eliminacion de datos personales
+	@Transactional
+	public void eliminarCliente(int id) {
+	    if (!clienteRepository.existsById(id)) {
+	        throw new RuntimeException("Cliente no encontrado");
+	    }
+	    // Si tiene datos relacionados (solicitudes, mensajes, etc.), eliminarlos aquí
+	    clienteRepository.deleteById(id);
+	}
+
 }
