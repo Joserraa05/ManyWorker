@@ -88,21 +88,21 @@ public class ClienteController {
     }
     
     //Edicion de datos personales
-    @PutMapping("/{id}")
+    @PutMapping("/update/{id}")
     public ResponseEntity<Cliente> updateCliente(@PathVariable int id, @RequestBody Cliente updatedCliente) {
         Cliente cliente = clienteService.updateCliente(id, updatedCliente);
         return ResponseEntity.ok(cliente);
     }
     
     //Exportacion de datos personales
-    @GetMapping("/{id}/export")
+    @GetMapping("/exportar/{id}/export")
     public ResponseEntity<Map<String, Object>> exportarDatos(@PathVariable int id) {
         Map<String, Object> datos = clienteService.exportarDatos(id);
         return ResponseEntity.ok(datos);
     }
 
     //Eliminacion de datos personales
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/borrar/{id}")
     public ResponseEntity<Void> eliminarCliente(@PathVariable int id) {
         clienteService.eliminarCliente(id);
         return ResponseEntity.noContent().build();
