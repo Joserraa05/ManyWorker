@@ -21,7 +21,6 @@ public class Mensaje extends DomainEntity {
 	@ManyToOne
 	private Actor destinatario;
 	
-	@NotNull
 	private Date fechaEnvio;
 	
 	@NotBlank
