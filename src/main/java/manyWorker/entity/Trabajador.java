@@ -22,7 +22,10 @@ public class Trabajador extends Actor{
 		
 		//super.get() para recoger el nombre y apellido y formal el nombre comercial del trabajador
  		this.nombreComercial = super.getNombre() + " " + super.getApellido();
-		
 	}
+	
+	public Trabajador() {
+        super();
+    }
 	
 }

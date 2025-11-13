@@ -13,6 +13,7 @@ import manyWorker.entity.Mensaje;
 import manyWorker.service.MensajeService;
 
 // DTO simple para enviar mensajes
+// Este DTO es necesario para que la funcion de enviar mensaje funcione correctamente
 class EnviarMensajeRequest {
     public int idRemitente;
     public int idDestinatario;
