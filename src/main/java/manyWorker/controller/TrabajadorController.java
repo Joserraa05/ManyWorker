@@ -39,8 +39,9 @@ public class TrabajadorController {
     })
     public ResponseEntity<Trabajador> findById(@PathVariable int id) {
         Optional<Trabajador> oTrabajador = trabajadorService.findById(id);
-        return oTrabajador.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+        
+        if (oTrabajador.isPresent()) return ResponseEntity.ok(oTrabajador.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping

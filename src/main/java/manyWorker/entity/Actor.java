@@ -124,5 +124,4 @@ public class Actor extends DomainEntity{
 	public void setNumeroPerfiles(List<PerfilSocial> numeroPerfiles) {
 		this.numeroPerfiles = numeroPerfiles;
 	}
-	
 }

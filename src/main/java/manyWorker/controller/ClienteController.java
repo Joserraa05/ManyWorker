@@ -38,8 +38,9 @@ public class ClienteController {
     })
     public ResponseEntity<Cliente> findById(@PathVariable int id) {
         Optional<Cliente> oCliente = clienteService.findById(id);
-        return oCliente.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.notFound().build());
+        
+        if (oCliente.isPresent()) return ResponseEntity.ok(oCliente.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping
@@ -82,7 +83,6 @@ public class ClienteController {
         return ResponseEntity.ok("Cliente eliminado correctamente");
     }
     
-    //Exportacion de datos personales - ESTE SÍ MANTENERLO si es diferente
     @GetMapping("/exportar/{id}")
     @Operation(summary = "Exportar datos del cliente")
     public ResponseEntity<Map<String, Object>> exportarDatos(@PathVariable int id) {

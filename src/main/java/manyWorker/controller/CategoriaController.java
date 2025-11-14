@@ -1,6 +1,7 @@
 package manyWorker.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -23,54 +24,74 @@ public class CategoriaController {
     private CategoriaService categoriaService;
 
     @GetMapping
-    @Operation(summary = "Obtener todas las categorías", description = "Devuelve una lista completa de todas las categorías registradas en el sistema.")
+    @Operation(summary = "Obtener todas las categorías")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de categorías obtenida correctamente")
+        @ApiResponse(responseCode = "200", description = "Lista de categorías obtenida correctamente")
     })
-    public ResponseEntity<List<Categoria>> listar() {
-        return ResponseEntity.ok(categoriaService.listar());
+    public ResponseEntity<List<Categoria>> findAll() {
+        return ResponseEntity.ok(categoriaService.findAll());
+    }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Buscar categoría por ID")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categoría encontrada"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
+    })
+    public ResponseEntity<Categoria> findById(@PathVariable String id) {
+        Optional<Categoria> oCategoria = categoriaService.findById(id);
+        
+        if (oCategoria.isPresent()) {
+            return ResponseEntity.ok(oCategoria.get());
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
+        }
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva categoría", description = "Registra una nueva categoría en la base de datos.")
-    @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Categoría creada correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al crear la categoría") 
+    @Operation(summary = "Crear una nueva categoría")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Categoría creada correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
-    public ResponseEntity<String> crear(@RequestBody Categoria categoria) {
-        categoriaService.guardar(categoria);
-        return ResponseEntity.status(HttpStatus.OK).body("Categoría creada correctamente");
+    public ResponseEntity<String> save(@RequestBody Categoria categoria) {
+        Categoria savedCategoria = categoriaService.save(categoria);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Categoría creada correctamente con ID: " + savedCategoria.getId());
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar una categoría", description = "Actualiza los datos de una categoría existente mediante su ID.")
-    @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Categoría actualizada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Categoría no encontrada o datos inválidos"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar la categoría") 
+    @Operation(summary = "Actualizar una categoría")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categoría actualizada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    public ResponseEntity<String> actualizar(@PathVariable String id, @RequestBody Categoria datos) {
+    public ResponseEntity<String> update(@PathVariable String id, @RequestBody Categoria datos) {
         try {
-            categoriaService.actualizar(id, datos);
-            return ResponseEntity.status(HttpStatus.OK).body("Categoría actualizada correctamente");
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al actualizar la categoría: " + e.getMessage());
+            categoriaService.update(id, datos);
+            return ResponseEntity.ok("Categoría actualizada correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         }
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una categoría", description = "Elimina una categoría existente si no tiene tareas asociadas.")
-    @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Categoría eliminada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Categoría no encontrada o asociada a tareas") 
+    @Operation(summary = "Eliminar una categoría")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Categoría eliminada correctamente"),
+        @ApiResponse(responseCode = "400", description = "No se puede eliminar (tiene tareas asociadas)"),
+        @ApiResponse(responseCode = "404", description = "Categoría no encontrada")
     })
-    public ResponseEntity<String> eliminar(@PathVariable String id) {
+    public ResponseEntity<String> delete(@PathVariable String id) {
+        if (!categoriaService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categoría no encontrada");
+        }
         try {
-            categoriaService.eliminar(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Categoría eliminada correctamente");
+            categoriaService.delete(id);
+            return ResponseEntity.ok("Categoría eliminada correctamente");
         } catch (IllegalStateException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al eliminar la categoría");
         }
     }

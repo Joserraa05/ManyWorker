@@ -19,11 +19,6 @@ public class CategoriaService {
         return categoriaRepository.findAll();
     }
 
-    // MÉTODO Para el controller
-    public List<Categoria> listar() {
-        return categoriaRepository.findAll();
-    }
-
     public Optional<Categoria> findById(String id) {
         return categoriaRepository.findById(id);
     }
@@ -32,13 +27,12 @@ public class CategoriaService {
         return categoriaRepository.save(categoria);
     }
 
-    // MÉTODO Para el controller (alias de save)
-    public Categoria guardar(Categoria categoria) {
-        return categoriaRepository.save(categoria);
+    public boolean existsById(String id) {
+        return categoriaRepository.existsById(id);
     }
 
-    // MÉTODO Para actualizar en el controller
-    public Categoria actualizar(String id, Categoria datos) {
+    // Actualizar categoría
+    public Categoria update(String id, Categoria datos) {
         Optional<Categoria> categoriaExistente = categoriaRepository.findById(id);
         if (categoriaExistente.isPresent()) {
             Categoria categoria = categoriaExistente.get();
@@ -51,11 +45,10 @@ public class CategoriaService {
         }
     }
 
-    // MÉTODO Para eliminar en el controller
-    public void eliminar(String id) {
+    // Eliminar categoría
+    public void delete(String id) {
         Optional<Categoria> categoria = categoriaRepository.findById(id);
         if (categoria.isPresent()) {
-            // Verificar si la categoría tiene tareas asociadas
             if (!categoria.get().getTareas().isEmpty()) {
                 throw new IllegalStateException("No se puede eliminar una categoría que tiene tareas asociadas");
             }
@@ -65,13 +58,9 @@ public class CategoriaService {
         }
     }
 
-    public void deleteById(String id) {
-        categoriaRepository.deleteById(id);
-    }
-
+    // Inicializar categorías por defecto
     public void inicializarCategorias() {
         if (categoriaRepository.count() == 0) {
-            // Categorias de ejemplos y las que son de reparación aparecen como true
             crearCategoria("Carpintería", "Términos de carpintería", false);
             crearCategoria("Reparación de techos", "Términos de reparación de techos", true);
             crearCategoria("Limpieza", "Términos de limpieza", false);
@@ -100,7 +89,6 @@ public class CategoriaService {
         categoria.setTitulo(titulo);
         categoria.setLeyesAplicables(leyes);
         categoria.setEsReparacion(esReparacion);
-        // El ID se generará automáticamente con @PrePersist
         categoriaRepository.save(categoria);
     }
 }

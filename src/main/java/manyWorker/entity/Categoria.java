@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Pattern;
 
 @Entity
 public class Categoria {
+	
 	//Comprobamos que el formato sea correcto por si se introduce manualmente
 	@Id
 	@Pattern(regexp = "\\d{6}-[A-Z0-9]{6}", message = "Formato de ID inválido (yyMMdd-XXXXXX)")

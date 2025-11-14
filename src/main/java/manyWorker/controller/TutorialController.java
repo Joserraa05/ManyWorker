@@ -37,8 +37,9 @@ public class TutorialController {
     })
     public ResponseEntity<Tutorial> findById(@PathVariable int id) {
         Optional<Tutorial> oTutorial = tutorialService.findById(id);
-        return oTutorial.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build());
+
+        if (oTutorial.isPresent()) return ResponseEntity.ok(oTutorial.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping

@@ -25,7 +25,6 @@ public class Solicitud extends DomainEntity{
     @ManyToOne
     private Trabajador trabajador;
 
-    //Relación con Tarea
     @ManyToOne
     private Tarea tarea;
 
@@ -74,7 +73,6 @@ public class Solicitud extends DomainEntity{
         this.trabajador = trabajador;
     }
 
-    // NUEVOS GETTER Y SETTER para Tarea
     public Tarea getTarea() {
         return tarea;
     }

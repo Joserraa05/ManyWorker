@@ -13,68 +13,73 @@ import jakarta.validation.constraints.NotNull;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 public class Mensaje extends DomainEntity {
 
-	@NotNull
-	@ManyToOne
-	private Actor remitente;
-	
-	@NotNull
-	@ManyToOne
-	private Actor destinatario;
-	
-	private Date fechaEnvio;
-	
-	@NotBlank
-	private String asunto;
-	
-	@NotBlank
-	private String cuerpo;
+    @NotNull
+    @ManyToOne
+    private Actor remitente;
+    
+    @NotNull
+    @ManyToOne
+    private Actor destinatario;
+    
+    private Date fechaEnvio;
+    
+    @NotBlank
+    private String asunto;
+    
+    @NotBlank
+    private String cuerpo;
 
-	public Mensaje(Actor remitente, Actor destinatario, @NotBlank Date fechaEnvío, @NotBlank String asunto, @NotBlank String cuerpo) {
-		super();
-		this.remitente = remitente;
-		this.destinatario = destinatario;
-		this.fechaEnvio = fechaEnvío;
-		this.asunto = asunto;
-		this.cuerpo = cuerpo;
-	}
+    public Mensaje(@NotNull Actor remitente, @NotNull Actor destinatario, Date fechaEnvio, 
+                   @NotBlank String asunto, @NotBlank String cuerpo) {
+        super();
+        this.remitente = remitente;
+        this.destinatario = destinatario;
+        this.fechaEnvio = fechaEnvio;
+        this.asunto = asunto;
+        this.cuerpo = cuerpo;
+    }
 
-	public Actor getRemitente() {
-		return remitente;
-	}
+    public Mensaje() {
+        super();
+    }
 
-	public void setRemitente(Actor remitente) {
-		this.remitente = remitente;
-	}
+    public Actor getRemitente() {
+        return remitente;
+    }
 
-	public Actor getDestinatario() {
-		return destinatario;
-	}
+    public void setRemitente(Actor remitente) {
+        this.remitente = remitente;
+    }
 
-	public void setDestinatario(Actor destinatario) {
-		this.destinatario = destinatario;
-	}
+    public Actor getDestinatario() {
+        return destinatario;
+    }
 
-	public Date getFechaEnvio() {
-		return fechaEnvio;
-	}
+    public void setDestinatario(Actor destinatario) {
+        this.destinatario = destinatario;
+    }
 
-	public void setFechaEnvio(Date fechaEnvío) {
-		this.fechaEnvio = fechaEnvío;
-	}
+    public Date getFechaEnvio() {
+        return fechaEnvio;
+    }
 
-	public String getAsunto() {
-		return asunto;
-	}
+    public void setFechaEnvio(Date fechaEnvio) {
+        this.fechaEnvio = fechaEnvio;
+    }
 
-	public void setAsunto(String asunto) {
-		this.asunto = asunto;
-	}
+    public String getAsunto() {
+        return asunto;
+    }
 
-	public String getCuerpo() {
-		return cuerpo;
-	}
+    public void setAsunto(String asunto) {
+        this.asunto = asunto;
+    }
 
-	public void setCuerpo(String cuerpo) {
-		this.cuerpo = cuerpo;
-	}
+    public String getCuerpo() {
+        return cuerpo;
+    }
+
+    public void setCuerpo(String cuerpo) {
+        this.cuerpo = cuerpo;
+    }
 }

@@ -24,46 +24,48 @@ public class SolicitudController {
     private SolicitudService solicitudService;
 
     @GetMapping
-    @Operation(summary = "Obtener todas las solicitudes", description = "Devuelve la lista completa de solicitudes registradas en el sistema")
+    @Operation(summary = "Obtener todas las solicitudes")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida correctamente")
+        @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida correctamente")
     })
-    public ResponseEntity<List<Solicitud>> listar() {
-        return ResponseEntity.ok(solicitudService.listar());
+    public ResponseEntity<List<Solicitud>> findAll() {
+        return ResponseEntity.ok(solicitudService.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar solicitud por ID", description = "Busca una solicitud específica utilizando su ID")
+    @Operation(summary = "Buscar solicitud por ID")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
-            @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
+        @ApiResponse(responseCode = "200", description = "Solicitud encontrada"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
     public ResponseEntity<Solicitud> findById(@PathVariable int id) {
         Optional<Solicitud> solicitud = solicitudService.findById(id);
-        return solicitud.map(ResponseEntity::ok)
-                        .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND).body(null));
+        
+        if (solicitud.isPresent()) return ResponseEntity.ok(solicitud.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva solicitud", description = "Registra una nueva solicitud en el sistema")
+    @Operation(summary = "Crear una nueva solicitud")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "201", description = "Solicitud creada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Datos inválidos")
+        @ApiResponse(responseCode = "201", description = "Solicitud creada correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
     public ResponseEntity<String> crear(@RequestBody Solicitud solicitud) {
         try {
-            solicitudService.crear(solicitud);
-            return ResponseEntity.status(HttpStatus.CREATED).body("Solicitud creada correctamente");
+            Solicitud savedSolicitud = solicitudService.crear(solicitud);
+            return ResponseEntity.status(HttpStatus.CREATED)
+                    .body("Solicitud creada correctamente con ID: " + savedSolicitud.getId());
         } catch (IllegalArgumentException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PutMapping("/{id}/aceptar")
-    @Operation(summary = "Aceptar una solicitud", description = "Cambia el estado de la solicitud a ACEPTADO")
+    @Operation(summary = "Aceptar una solicitud")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
-            @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
+        @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
     public ResponseEntity<String> aceptar(@PathVariable int id) {
         try {
@@ -75,10 +77,10 @@ public class SolicitudController {
     }
 
     @PutMapping("/{id}/rechazar")
-    @Operation(summary = "Rechazar una solicitud", description = "Cambia el estado de la solicitud a RECHAZADO")
+    @Operation(summary = "Rechazar una solicitud")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Solicitud rechazada correctamente"),
-            @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
+        @ApiResponse(responseCode = "200", description = "Solicitud rechazada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
     public ResponseEntity<String> rechazar(@PathVariable int id) {
         try {
@@ -90,23 +92,21 @@ public class SolicitudController {
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una solicitud", description = "Elimina una solicitud pendiente de la base de datos")
+    @Operation(summary = "Eliminar una solicitud")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Solicitud eliminada correctamente"),
-            @ApiResponse(responseCode = "400", description = "No se puede eliminar solicitud no pendiente"),
-            @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
+        @ApiResponse(responseCode = "200", description = "Solicitud eliminada correctamente"),
+        @ApiResponse(responseCode = "400", description = "No se puede eliminar solicitud no pendiente"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada")
     })
     public ResponseEntity<String> eliminar(@PathVariable int id) {
-        Optional<Solicitud> solicitud = solicitudService.findById(id);
-        if (solicitud.isPresent()) {
-            try {
-                solicitudService.eliminar(id);
-                return ResponseEntity.ok("Solicitud eliminada correctamente");
-            } catch (RuntimeException e) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-            }
-        } else {
+        if (!solicitudService.existsById(id)) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Solicitud no encontrada");
+        }
+        try {
+            solicitudService.eliminar(id);
+            return ResponseEntity.ok("Solicitud eliminada correctamente");
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

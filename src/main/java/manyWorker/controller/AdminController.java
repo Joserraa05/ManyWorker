@@ -33,18 +33,19 @@ public class AdminController {
     @Operation(summary = "Buscar administrador por ID")
     @ApiResponses(value = { 
             @ApiResponse(responseCode = "200", description = "Administrador encontrado"),
-            @ApiResponse(responseCode = "404", description = "Administrador no encontrado") // Cambiado a 404
+            @ApiResponse(responseCode = "404", description = "Administrador no encontrado")
     })
     public ResponseEntity<Admin> findById(@PathVariable int id) {
         Optional<Admin> oAdmin = adminService.findById(id);
-        return oAdmin.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.notFound().build()); // Mejor usar 404
+        
+        if (oAdmin.isPresent()) return ResponseEntity.ok(oAdmin.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping
     @Operation(summary = "Crear un nuevo administrador")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "201", description = "Administrador creado correctamente"), // Cambiado a 201
+            @ApiResponse(responseCode = "201", description = "Administrador creado correctamente"),
             @ApiResponse(responseCode = "400", description = "Datos inválidos") 
     })
     public ResponseEntity<String> save(@RequestBody Admin admin) {

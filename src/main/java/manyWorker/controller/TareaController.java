@@ -24,65 +24,64 @@ public class TareaController {
     private TareaService tareaService;
 
     @GetMapping
-    @Operation(summary = "Obtener todas las tareas", description = "Devuelve una lista completa de todas las tareas registradas en el sistema.")
+    @Operation(summary = "Obtener todas las tareas")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Lista de tareas obtenida correctamente")
+        @ApiResponse(responseCode = "200", description = "Lista de tareas obtenida correctamente")
     })
     public ResponseEntity<List<Tarea>> findAll() {
         return ResponseEntity.ok(tareaService.findAll());
     }
 
     @GetMapping("/{id}")
-    @Operation(summary = "Buscar tarea por ID", description = "Busca una tarea específica utilizando su ID.")
+    @Operation(summary = "Buscar tarea por ID")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Tarea encontrada"),
-            @ApiResponse(responseCode = "400", description = "Tarea no encontrada")
+        @ApiResponse(responseCode = "200", description = "Tarea encontrada"),
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
     })
     public ResponseEntity<Tarea> findById(@PathVariable String id) {
         Optional<Tarea> oTarea = tareaService.findById(id);
-        return oTarea.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+        
+        if (oTarea.isPresent()) return ResponseEntity.ok(oTarea.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping
-    @Operation(summary = "Crear una nueva tarea", description = "Registra una nueva tarea en la base de datos.")
+    @Operation(summary = "Crear una nueva tarea")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Tarea creada correctamente"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al crear la tarea") 
+        @ApiResponse(responseCode = "201", description = "Tarea creada correctamente"),
+        @ApiResponse(responseCode = "400", description = "Datos inválidos")
     })
     public ResponseEntity<String> save(@RequestBody Tarea tarea) {
-        tareaService.save(tarea);
-        return ResponseEntity.status(HttpStatus.OK).body("Tarea creada correctamente");
+        Tarea savedTarea = tareaService.save(tarea);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body("Tarea creada correctamente con ID: " + savedTarea.getId());
     }
 
     @PutMapping("/{id}")
-    @Operation(summary = "Actualizar una tarea", description = "Actualiza la información de una tarea existente según su ID.")
+    @Operation(summary = "Actualizar una tarea")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Tarea actualizada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Tarea no encontrada o datos inválidos"),
-            @ApiResponse(responseCode = "500", description = "Error interno del servidor al actualizar la tarea") 
+        @ApiResponse(responseCode = "200", description = "Tarea actualizada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
     })
     public ResponseEntity<String> update(@PathVariable String id, @RequestBody Tarea tarea) {
-        if (tareaService.update(id, tarea) == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tarea no encontrada");
-        } else {
-            return ResponseEntity.status(HttpStatus.OK).body("Tarea actualizada correctamente");
+        Tarea updatedTarea = tareaService.update(id, tarea);
+        if (updatedTarea == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea no encontrada");
         }
+        return ResponseEntity.ok("Tarea actualizada correctamente");
     }
 
     @DeleteMapping("/{id}")
-    @Operation(summary = "Eliminar una tarea", description = "Elimina una tarea existente de la base de datos utilizando su ID.")
+    @Operation(summary = "Eliminar una tarea")
     @ApiResponses(value = { 
-            @ApiResponse(responseCode = "200", description = "Tarea eliminada correctamente"),
-            @ApiResponse(responseCode = "400", description = "Tarea no encontrada") 
+        @ApiResponse(responseCode = "200", description = "Tarea eliminada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Tarea no encontrada")
     })
     public ResponseEntity<String> delete(@PathVariable String id) {
-        Optional<Tarea> oTarea = tareaService.findById(id);
-        if (oTarea.isPresent()) {
-            tareaService.delete(id);
-            return ResponseEntity.status(HttpStatus.OK).body("Tarea eliminada correctamente");
-        } else {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Tarea no encontrada");
+        if (!tareaService.existsById(id)) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Tarea no encontrada");
         }
+        tareaService.delete(id);
+        return ResponseEntity.ok("Tarea eliminada correctamente");
     }
 }

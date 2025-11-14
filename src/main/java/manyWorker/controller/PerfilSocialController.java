@@ -39,8 +39,9 @@ public class PerfilSocialController {
     })
     public ResponseEntity<PerfilSocial> findById(@PathVariable int id) {
         Optional<PerfilSocial> oPerfilSocial = perfilSocialService.findById(id);
-        return oPerfilSocial.map(ResponseEntity::ok)
-                     .orElseGet(() -> ResponseEntity.status(HttpStatus.BAD_REQUEST).body(null));
+        
+        if (oPerfilSocial.isPresent()) return ResponseEntity.ok(oPerfilSocial.get());
+        else return ResponseEntity.status(HttpStatus.NOT_FOUND).body(null);
     }
 
     @PostMapping

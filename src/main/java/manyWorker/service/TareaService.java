@@ -13,34 +13,26 @@ import manyWorker.repository.TareaRepository;
 public class TareaService {
 
     @Autowired
-    private TareaRepository tareaRepo;
+    private TareaRepository tareaRepository;
 
-    /**
-     * Obtiene todas las tareas registradas.
-     */
     public List<Tarea> findAll() {
-        return tareaRepo.findAll();
+        return tareaRepository.findAll();
     }
 
-    /**
-     * Busca una tarea por su ID.
-     */
     public Optional<Tarea> findById(String id) {
-        return tareaRepo.findById(id);
+        return tareaRepository.findById(id);
     }
 
-    /**
-     * Guarda una nueva tarea en la base de datos.
-     */
     public Tarea save(Tarea tarea) {
-        return tareaRepo.save(tarea);
+        return tareaRepository.save(tarea);
     }
 
-    /**
-     * Actualiza una tarea existente.
-     */
+    public boolean existsById(String id) {
+        return tareaRepository.existsById(id);
+    }
+
     public Tarea update(String id, Tarea datos) {
-        Optional<Tarea> optional = tareaRepo.findById(id);
+        Optional<Tarea> optional = tareaRepository.findById(id);
         if (optional.isPresent()) {
             Tarea tarea = optional.get();
             tarea.setDescripcion(datos.getDescripcion());
@@ -48,16 +40,17 @@ public class TareaService {
             tarea.setPrecioMax(datos.getPrecioMax());
             tarea.setFechaFin(datos.getFechaFin());
             tarea.setCategoria(datos.getCategoria());
-            return tareaRepo.save(tarea);
+            return tareaRepository.save(tarea);
         }
         return null;
     }
 
-    /**
-     * Elimina una tarea según su ID.
-     */
     public void delete(String id) {
-        tareaRepo.deleteById(id);
+        tareaRepository.deleteById(id);
+    }
+
+    // Método para verificar si una categoría tiene tareas asociadas
+    public boolean existsByCategoriaId(String categoriaId) {
+        return tareaRepository.existsByCategoria_Id(categoriaId);
     }
 }
-
