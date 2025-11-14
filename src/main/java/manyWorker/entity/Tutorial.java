@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.validator.constraints.URL;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
@@ -12,6 +13,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Pattern;
 
 @Entity
 public class Tutorial extends DomainEntity {
@@ -29,7 +31,11 @@ public class Tutorial extends DomainEntity {
     private String resumen;
     
     @ElementCollection
-    private List<String> imagenes;
+    // Validamos que sea una URL y termina con una extensión de imagen 
+    private List<
+    	@URL 
+    	@Pattern( regexp = ".*\\.(jpg|jpeg|png|gif)$", flags = Pattern.Flag.CASE_INSENSITIVE) 
+    String> imagenes;
     
     @NotBlank
     @Column(columnDefinition = "TEXT")
