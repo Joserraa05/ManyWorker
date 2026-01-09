@@ -38,7 +38,7 @@ public class JWTUtils {
 	private ClienteService clienteService;
 
 	private static final String JWT_FIRMA = "ManyWorker";
-	private static final long EXTENCION_TOKEN = 86400;
+	private static final long EXTENCION_TOKEN = 86400 * 1000L;
 
 	public String getToken(HttpServletRequest request) {
 		String tokenBearer = request.getHeader("Authorization");
