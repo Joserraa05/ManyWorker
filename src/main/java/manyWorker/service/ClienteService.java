@@ -6,10 +6,12 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import jakarta.transaction.Transactional;
 import manyWorker.entity.Cliente;
+import manyWorker.entity.Roles;
 import manyWorker.entity.Trabajador;
 import manyWorker.repository.ClienteRepository;
 
@@ -19,6 +21,9 @@ public class ClienteService {
     @Autowired
     private ClienteRepository clienteRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+    
     public Optional<Cliente> findByUsername(String username) {
         return clienteRepository.findByUsername(username);
     }
@@ -32,6 +37,13 @@ public class ClienteService {
     }
 
     public Cliente save(Cliente cliente) {
+    	cliente.setRol(Roles.CLIENTES); 
+        
+        if (cliente.getPassword() != null) {
+            String encodedPass = passwordEncoder.encode(cliente.getPassword());
+            cliente.setPassword(encodedPass);
+        }
+    	
         return this.clienteRepository.save(cliente);
     }
 
