@@ -17,7 +17,6 @@ import manyWorker.entity.Actor;
 import manyWorker.entity.Mensaje;
 import manyWorker.repository.ActorRepository;
 import manyWorker.repository.MensajeRepository;
-import manyWorker.security.JWTUtils;
 import manyWorker.service.MensajeService;
 
 //DTO para enviar mensajes usando username

@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import jakarta.transaction.Transactional;
 import manyWorker.entity.Cliente;
 import manyWorker.entity.Roles;
-import manyWorker.entity.Trabajador;
 import manyWorker.repository.ClienteRepository;
 
 @Service

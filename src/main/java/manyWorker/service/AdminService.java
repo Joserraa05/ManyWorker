@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import manyWorker.entity.Actor;
 import manyWorker.entity.Admin;
 import manyWorker.entity.Roles;
 import manyWorker.repository.AdminRepository;
