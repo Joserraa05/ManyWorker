@@ -56,7 +56,8 @@ public class ClienteController {
     })
     public ResponseEntity<?> findById(@PathVariable int id) {
     	Actor clienteLogueado = jwtUtils.userLogin();
-    	
+        System.out.println(clienteLogueado.getNombre());
+
         if (clienteLogueado == null || (clienteLogueado.getId() != id && !"ADMINISTRADOR".equals(clienteLogueado.getRol().name()))) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para ver este perfil");
         }
@@ -117,7 +118,6 @@ public class ClienteController {
     })
     public ResponseEntity<?> update(@PathVariable int id, @RequestBody Cliente cliente) {
     	Cliente clienteLogueado = jwtUtils.userLogin();
-        
         if (clienteLogueado == null || clienteLogueado.getId() != id) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("No tienes permiso para actualizar este perfil");
         }

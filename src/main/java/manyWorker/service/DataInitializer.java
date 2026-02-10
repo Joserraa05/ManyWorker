@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
+/*
 @Component
 public class DataInitializer implements CommandLineRunner {
 
@@ -151,4 +151,4 @@ public class DataInitializer implements CommandLineRunner {
         tutorialRepository.save(tutorial);
         System.out.println(">> Tutorial creado vinculado a Pepe.");
     }
-}
+}*/

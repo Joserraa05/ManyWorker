@@ -54,7 +54,7 @@ public class SecurityConfiguration {
                 // Rutas ADMINISTRADOR
                 .requestMatchers("/admin/**").hasAuthority("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.GET, "/trabajador").hasAuthority("ADMINISTRADOR")
-                .requestMatchers(HttpMethod.GET, "/cliente", "/cliente/*").hasAuthority("ADMINISTRADOR")
+                .requestMatchers(HttpMethod.GET, "/cliente").hasAuthority("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PUT, "/banear/**").hasAuthority("ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PUT, "/desbanear/**").hasAuthority("ADMINISTRADOR")
 
@@ -64,7 +64,7 @@ public class SecurityConfiguration {
                 .requestMatchers(HttpMethod.DELETE, "/trabajador").hasAuthority("TRABAJADOR")
 
                 // Rutas CLIENTE
-                .requestMatchers("/cliente/**").hasAuthority("CLIENTE")
+                .requestMatchers("/cliente/**").hasAnyAuthority("CLIENTE", "ADMINISTRADOR")
                 .requestMatchers(HttpMethod.PUT, "/cliente").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.DELETE, "/cliente").hasAuthority("CLIENTE")
                 .requestMatchers("/cliente/miPerfil").hasAuthority("CLIENTE")
