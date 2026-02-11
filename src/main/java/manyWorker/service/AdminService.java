@@ -30,6 +30,7 @@ public class AdminService {
 
 	public Admin save(Admin admin) {
 		admin.setRol(Roles.ADMINISTRADOR);
+		admin.setAuthority("ADMINISTRADOR");
         
         if (admin.getPassword() != null) {
             admin.setPassword(passwordEncoder.encode(admin.getPassword()));
@@ -38,7 +39,7 @@ public class AdminService {
 		return this.adminRepository.save(admin);
 	}
 
-	// TODO; Solo el usuario propietario puede realizar esta accion
+	// FIX: update NO reencripta el password. Guarda directamente con repository.
 	public Admin update(int idAdmin, Admin admin) {
 		Optional<Admin> oAdmin = findById(idAdmin);
 		if (oAdmin.isPresent()) {
@@ -50,13 +51,12 @@ public class AdminService {
 			a.setFoto(admin.getFoto());
 			a.setTelefono(admin.getTelefono());
 			a.setDireccion(admin.getDireccion());
-			return save(a);
+			// NO llamamos a save() porque reencriptaría el password
+			return this.adminRepository.save(a);
 		}
 		return null;
 	}
 
-	// TODO; Solo el usuario propietario puede realizar esta accion
-	// TODO: Posteriormente se van a a anonimizar los datos en vez de eliminar.
 	public void delete(int id) {
 		this.adminRepository.deleteById(id);
 	}

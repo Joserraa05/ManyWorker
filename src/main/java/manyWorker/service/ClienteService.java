@@ -36,7 +36,8 @@ public class ClienteService {
     }
 
     public Cliente save(Cliente cliente) {
-    	cliente.setRol(Roles.CLIENTE); 
+    	cliente.setRol(Roles.CLIENTE);
+    	cliente.setAuthority("CLIENTE");
         
         if (cliente.getPassword() != null) {
             String encodedPass = passwordEncoder.encode(cliente.getPassword());
@@ -46,6 +47,7 @@ public class ClienteService {
         return this.clienteRepository.save(cliente);
     }
 
+    // FIX: update NO reencripta el password. Guarda directamente con repository.
     public Cliente update(int idCliente, Cliente cliente) {
         Optional<Cliente> oCliente = findById(idCliente);
         if (oCliente.isPresent()) {
@@ -58,7 +60,8 @@ public class ClienteService {
             c.setTelefono(cliente.getTelefono());
             c.setDireccion(cliente.getDireccion());
             c.setNumeroPerfiles(cliente.getNumeroPerfiles());
-            return save(c);
+            // NO llamamos a save() porque reencriptaría el password
+            return this.clienteRepository.save(c);
         }
         return null;
     }

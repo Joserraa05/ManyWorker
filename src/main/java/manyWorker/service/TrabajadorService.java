@@ -34,6 +34,7 @@ public class TrabajadorService {
 
 	public Trabajador save(Trabajador trabajador) {
 		trabajador.setRol(Roles.TRABAJADOR);
+		trabajador.setAuthority("TRABAJADOR");
 		
 		if (trabajador.getPassword() != null) {
             String encodedPass = passwordEncoder.encode(trabajador.getPassword());
@@ -43,9 +44,9 @@ public class TrabajadorService {
 		return this.trabajadorRepository.save(trabajador);
 	}
 
-	// TODO; Solo el usuario propietario puede realizar esta accion
+	// FIX: update NO reencripta el password, y actualiza nombreComercial
 	public Trabajador update(int idTrabajador, Trabajador trabajador) {
-		Optional<Trabajador> oTrabajador= findById(idTrabajador);
+		Optional<Trabajador> oTrabajador = findById(idTrabajador);
 		if (oTrabajador.isPresent()) {
 			Trabajador t = oTrabajador.get();
 			t.setNombre(trabajador.getNombre());
@@ -55,13 +56,19 @@ public class TrabajadorService {
 			t.setFoto(trabajador.getFoto());
 			t.setTelefono(trabajador.getTelefono());
 			t.setDireccion(trabajador.getDireccion());
-			return save(t);
+			
+			// Actualizar nombreComercial si viene
+			if (trabajador.getNombreComercial() != null) {
+				t.setNombreComercial(trabajador.getNombreComercial());
+			}
+			
+			// NO llamamos a save() porque ese método reencripta el password.
+			// Guardamos directamente con el repository.
+			return this.trabajadorRepository.save(t);
 		}
 		return null;
 	}
 
-	// TODO; Solo el usuario propietario puede realizar esta accion
-	// TODO: Posteriormente se van a a anonimizar los datos en vez de eliminar.
 	public void delete(int id) {
 		this.trabajadorRepository.deleteById(id);
 	}

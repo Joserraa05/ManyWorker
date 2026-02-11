@@ -24,13 +24,22 @@ public class MensajeService {
 	@Autowired
 	private ActorRepository actorRepository;
 
+	// ====== MÉTODO HELPER: obtener el Actor autenticado de forma segura ======
+	// El Principal de Spring Security es un String (username), NO un objeto Actor.
+	// Por eso hay que buscarlo en la BD.
+	private Actor getActorAutenticado() {
+		String username = SecurityContextHolder.getContext().getAuthentication().getName();
+		return actorRepository.findByUsername(username)
+				.orElseThrow(() -> new RuntimeException("Usuario autenticado no encontrado en BD"));
+	}
+
 	public Optional<Mensaje> findById(int id) {
 		Optional<Mensaje> mensaje = mensajeRepository.findById(id);
 
 		if (mensaje.isEmpty())
 			return Optional.empty();
 
-		Actor actorAutenticado = (Actor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Actor actorAutenticado = getActorAutenticado();
 
 		Mensaje m = mensaje.get();
 
@@ -56,7 +65,7 @@ public class MensajeService {
 	public void delete(int id) {
 		Mensaje m = mensajeRepository.findById(id).orElseThrow(() -> new RuntimeException("Mensaje no encontrado"));
 
-		Actor actorAutenticado = (Actor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+		Actor actorAutenticado = getActorAutenticado();
 
 		boolean esAdmin = actorAutenticado.getRol() == Roles.ADMINISTRADOR;
 
