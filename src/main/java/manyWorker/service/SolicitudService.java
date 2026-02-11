@@ -223,4 +223,8 @@ public class SolicitudService {
     public List<Solicitud> obtenerSolicitudesPorTrabajador(int trabajadorId) {
         return solicitudRepository.findByTrabajadorId(trabajadorId);
     }
+    
+    public List<Solicitud> obtenerSolicitudesPorTarea(String tareaId) {
+        return solicitudRepository.findByTareaId(tareaId);
+    }
 }
