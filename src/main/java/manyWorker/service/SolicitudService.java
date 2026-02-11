@@ -219,4 +219,8 @@ public class SolicitudService {
 
         solicitudRepository.delete(solicitud);
     }
+    
+    public List<Solicitud> obtenerSolicitudesPorTrabajador(int trabajadorId) {
+        return solicitudRepository.findByTrabajadorId(trabajadorId);
+    }
 }

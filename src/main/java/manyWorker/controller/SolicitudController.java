@@ -13,6 +13,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import manyWorker.entity.Solicitud;
+import manyWorker.entity.Trabajador;
+import manyWorker.security.JWTUtils;
 import manyWorker.service.SolicitudService;
 
 @RestController
@@ -22,6 +24,9 @@ public class SolicitudController {
 
     @Autowired
     private SolicitudService solicitudService;
+    
+    @Autowired
+    private JWTUtils jwtUtils;
 
     @GetMapping
     @Operation(summary = "Obtener todas las solicitudes", description = "Devuelve una lista de todas las solicitudes del sistema")
@@ -98,32 +103,7 @@ public class SolicitudController {
         }
     }
 
-    @PutMapping("/{id}/aceptar")
-    @Operation(summary = "Aceptar una solicitud", description = "Cambia el estado de la solicitud a ACEPTADO y envía notificaciones automáticas")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
-        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
-        @ApiResponse(responseCode = "400", description = "ID inválido"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
-        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
-        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
-    })
-    public ResponseEntity<?> aceptar(@PathVariable int id) {
-        try {
-            if (id <= 0) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de solicitud inválido");
-            }
-            
-            solicitudService.aceptar(id);
-            return ResponseEntity.ok("Solicitud aceptada correctamente. Se han enviado notificaciones al cliente y trabajador.");
-            
-        } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al aceptar la solicitud: " + e.getMessage());
-        }
-    }
+    
 
     @PutMapping("/{id}/rechazar")
     @Operation(summary = "Rechazar una solicitud", description = "Cambia el estado de la solicitud a RECHAZADO y envía notificaciones automáticas")
@@ -182,4 +162,66 @@ public class SolicitudController {
                     .body("Error al eliminar la solicitud: " + e.getMessage());
         }
     }
+    
+    @PutMapping("/aceptar") 
+    @Operation(summary = "Aceptar una solicitud", description = "Cambia el estado de la solicitud a ACEPTADO y envía notificaciones automáticas")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Solicitud aceptada correctamente"),
+        @ApiResponse(responseCode = "404", description = "Solicitud no encontrada"),
+        @ApiResponse(responseCode = "400", description = "ID inválido o no proporcionado en el body"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
+        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
+    })
+    public ResponseEntity<?> aceptar(@RequestBody Solicitud solicitud) { 
+        try {
+            int id = solicitud.getId();
+
+            if (id <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("ID de solicitud inválido o no proporcionado");
+            }
+            
+            solicitudService.aceptar(id);
+            return ResponseEntity.ok("Solicitud aceptada correctamente. Se han enviado notificaciones al cliente y trabajador.");
+            
+        } catch (RuntimeException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al aceptar la solicitud: " + e.getMessage());
+        }
+    }
+    
+    @GetMapping("/trabajador")
+    @Operation(summary = "Obtener MIS solicitudes", description = "Devuelve las solicitudes del trabajador que ha iniciado sesión basado en su token JWT")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida correctamente"),
+        @ApiResponse(responseCode = "204", description = "No tienes solicitudes registradas"),
+        @ApiResponse(responseCode = "401", description = "Token JWT inválido o ausente"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+    })
+    public ResponseEntity<?> obtenerMisSolicitudes(@RequestHeader(value = "Authorization", required = false) String headerAuth) {
+        try {
+            if (headerAuth == null || !headerAuth.startsWith("Bearer ")) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token no proporcionado o formato inválido");
+            }
+
+            
+            Trabajador trabajador = jwtUtils.userLogin();
+
+            List<Solicitud> misSolicitudes = solicitudService.obtenerSolicitudesPorTrabajador(trabajador.getId());
+
+            if (misSolicitudes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No tienes solicitudes registradas");
+            }
+
+            return ResponseEntity.ok(misSolicitudes);
+
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al procesar el token o buscar las solicitudes: " + e.getMessage());
+        }
+    }
+    
+    
 }
