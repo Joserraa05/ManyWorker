@@ -138,24 +138,29 @@ public class MensajeController {
     }
 
     @PostMapping("/broadcast")
-    @Operation(summary = "Enviar mensaje broadcast", description = "Envía un mensaje a todos los usuarios del sistema (excepto al remitente)")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "201", description = "Mensajes broadcast enviados correctamente"),
-        @ApiResponse(responseCode = "400", description = "Datos del mensaje inválidos"),
-        @ApiResponse(responseCode = "403", description = "No autorizado para enviar broadcast"),
-        @ApiResponse(responseCode = "404", description = "Remitente no encontrado"),
-        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
-        @ApiResponse(responseCode = "401", description = "No autenticado token JWT requerido"),
-        @ApiResponse(responseCode = "403", description = "No autorizado, permisos insuficientes"),
-    })
+    @Operation(summary = "Enviar mensaje broadcast", description = "Envía un mensaje a todos los usuarios...")
     public ResponseEntity<?> enviarBroadcast(@RequestBody BroadcastRequest request) {
-    	try {
-            Actor remitente = (Actor) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        try {
+            // 1. OBTENER EL USERNAME DEL CONTEXTO DE SEGURIDAD (ESTO ES SEGURO)
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
             
-            if (remitente == null || !"ADMINISTRADOR".equals(remitente.getRol().name())) {
+            // 2. BUSCAR EL ACTOR REAL EN LA BASE DE DATOS
+            // (Necesitas tener actorRepository inyectado, como ya lo tienes en tu código)
+            Optional<manyWorker.entity.Actor> oRemitente = actorRepository.findByUsername(username);
+            
+            if (!oRemitente.isPresent()) {
+                return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario no encontrado en la base de datos");
+            }
+
+            manyWorker.entity.Actor remitente = oRemitente.get();
+            
+            // 3. VERIFICAR QUE SEA ADMINISTRADOR
+            // Asegúrate de que tu Enum Rol tenga el valor ADMINISTRADOR
+            if (!"ADMINISTRADOR".equalsIgnoreCase(remitente.getRol().toString())) {
                 return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Solo administradores pueden enviar broadcast");
             }
             
+            // 4. VALIDACIONES DE CAMPOS
             if (request.asunto == null || request.asunto.trim().isEmpty()) {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El asunto del mensaje es obligatorio");
             }
@@ -163,10 +168,13 @@ public class MensajeController {
                 return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("El cuerpo del mensaje es obligatorio");
             }
             
+            // 5. ENVIAR (Llama a tu servicio)
             List<Mensaje> enviados = mensajeService.enviarBroadcast(remitente.getId(), request.asunto, request.cuerpo);
+            
             return ResponseEntity.status(HttpStatus.CREATED).body(enviados);
             
         } catch (Exception e) {
+            e.printStackTrace(); // Verás el error real en la consola de Java
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error al enviar broadcast: " + e.getMessage());
         }

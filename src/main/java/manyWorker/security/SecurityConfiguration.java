@@ -73,6 +73,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/perfilSocial/**").hasAnyAuthority("CLIENTE", "TRABAJADOR")
                 
                 // Endpoints Solicitud
+                .requestMatchers(HttpMethod.GET, "/solicitudes/tarea/**").hasAuthority("CLIENTE")
                 .requestMatchers(HttpMethod.POST, "/solicitudes").hasAnyAuthority("CLIENTE", "TRABAJADOR")
                 .requestMatchers(HttpMethod.GET, "/solicitudes").hasAnyAuthority("CLIENTE", "TRABAJADOR")
                 .requestMatchers(HttpMethod.GET, "/solicitudes/{id}").hasAnyAuthority("CLIENTE", "TRABAJADOR")
@@ -87,6 +88,7 @@ public class SecurityConfiguration {
                 .requestMatchers("/solicitudes/*/rechazar").hasAuthority("CLIENTE")
                 .requestMatchers("/solicitudes/*/cancelar").hasAuthority("CLIENTE")
                 .requestMatchers("/solicitudes/*/valorar").hasAuthority("CLIENTE")
+
                 
                 // Rutas MENSAJE
                 .requestMatchers(HttpMethod.POST, "/mensajes/enviar").hasAnyAuthority("CLIENTE", "TRABAJADOR", "ADMINISTRADOR")

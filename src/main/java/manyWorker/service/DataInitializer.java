@@ -93,7 +93,6 @@ public class DataInitializer implements CommandLineRunner {
         admin.setAuthority(Roles.ADMINISTRADOR.toString());
         admin.setUsername("admin"); 
         admin.setPassword(passwordEncoder.encode("admin123"));
-        admin.setFoto("https://i.pinimg.com/236x/8e/cb/43/8ecb43e430c7d73e4ccca3ac6515b0c2.jpg");
 
         adminRepository.save(admin);
         System.out.println(">> Admin creado: admin@manyworker.com");

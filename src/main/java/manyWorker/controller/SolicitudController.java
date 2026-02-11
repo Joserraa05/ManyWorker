@@ -223,5 +223,28 @@ public class SolicitudController {
         }
     }
     
+    @GetMapping("/tarea/{tareaId}")
+    @Operation(summary = "Obtener solicitudes por tarea", description = "Devuelve todas las solicitudes enviadas a una tarea específica")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Lista de solicitudes obtenida correctamente"),
+        @ApiResponse(responseCode = "204", description = "No hay solicitudes registradas para esta tarea"),
+        @ApiResponse(responseCode = "500", description = "Error interno del servidor"),
+    })
+    public ResponseEntity<?> obtenerSolicitudesPorTarea(@PathVariable String tareaId) {
+        try {
+  
+            List<Solicitud> solicitudes = solicitudService.obtenerSolicitudesPorTarea(tareaId);
+            
+            if (solicitudes.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NO_CONTENT).body("No hay solicitudes para esta tarea");
+            }
+            return ResponseEntity.ok(solicitudes);
+            
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al buscar las solicitudes: " + e.getMessage());
+        }
+    }
+    
     
 }
